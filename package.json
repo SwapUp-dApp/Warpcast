@@ -7,12 +7,14 @@
   },
   "dependencies": {
     "@hono/node-server": "latest",
+    "axios": "^1.7.3",
     "frog": "latest",
     "hono": "^4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@types/react": "^18.3.3",
     "typescript": "latest"
   }
 }

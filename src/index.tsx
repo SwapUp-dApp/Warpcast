@@ -8,18 +8,27 @@ import { app as summaryApp } from "./pages/summary";
 import RowColumn from "./component/RowColumn";
 import NftGroups from "./component/NftGroups";
 import Title from "./component/Title";
-
+import axios from "axios";
+import { stat } from "../node_modules1/@nodelib/fs.stat/out";
 export const { Box, Image, Text, Columns, Column, Rows, Row } = createSystem();
-export const app = new Frog({
+type State = {
+  nftNum: number;
+  initNfts: any[];
+};
+export const app = new Frog<{ State: State }>({
   title: "Frog Frame",
+  initialState: {
+    nftNum: 0,
+    initNfts: [],
+  },
 });
 
 let nftNum: number = -1;
 
 app.use("/*", serveStatic({ root: "./public" }));
 
-app.frame("/", (c) => {
-  const { buttonValue } = c;
+app.frame("/", async (c) => {
+  const { buttonValue,  deriveState } = c;
   if (buttonValue === undefined) {
     nftNum = -1;
   } else {
@@ -28,6 +37,24 @@ app.frame("/", (c) => {
     nftNum = nftNum + a;
   }
 
+
+ 
+  const state = await deriveState(async (previousState) => {
+    if (previousState.initNfts.length === 0) {
+      try {
+        const response = await axios.get("http://localhost:8800/api/openswap/list");
+        previousState.initNfts = response.data.data;
+      } catch (error) {
+        console.error("Error fetching NFTs:", error);
+      }
+    }
+
+    // Update nftNum
+
+    return previousState;
+  });
+
+  //console.log(state.initNfts)
   return c.res({
     image: (
       <div
@@ -59,7 +86,7 @@ app.frame("/", (c) => {
           <Text>Trade ID XXXXXX</Text>
           <Text>I am trading.</Text>
         </div>
-        <NftGroups nftNum={nftNum} />
+        <NftGroups nftNum={state.nftNum} state = {state.initNfts} />
         <div
           style={{
             display: "flex",
