@@ -9,7 +9,7 @@ type NftGroupsProps = {
 const NftGroups = ({ nftNum, state }: NftGroupsProps) => {
   
 //console.log(state[0].metadata.init.tokens)
- console.log(state[0])
+ //console.log(state[0])
   if (state?.length === 0) {
     return <div>No NFTs found.</div>;
   }

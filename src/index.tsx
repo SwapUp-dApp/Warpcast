@@ -9,7 +9,6 @@ import RowColumn from "./component/RowColumn";
 import NftGroups from "./component/NftGroups";
 import Title from "./component/Title";
 import axios from "axios";
-import { stat } from "../node_modules1/@nodelib/fs.stat/out";
 export const { Box, Image, Text, Columns, Column, Rows, Row } = createSystem();
 type State = {
   nftNum: number;
@@ -37,22 +36,26 @@ app.frame("/", async (c) => {
     nftNum = nftNum + a;
   }
 
-
- 
-  const state = await deriveState(async (previousState) => {
+ //test api
+   //const detail = await axios.get("http://localhost:8800/api/swaps/get-swap-details/?trade_id=f917c6b8-6701-4c5c-a53b-0b327e311d22");
+   // console.log(detail)
+  const state = await deriveState(async (previousState: any) => {
     if (previousState.initNfts.length === 0) {
       try {
-        const response = await axios.get("http://localhost:8800/api/openswap/list");
+        const response = await axios.get("http://localhost:8800/api/openswap/list");// replace your real api endpoint
         previousState.initNfts = response.data.data;
+        console.log(response.data)
+     
+        // Update nftNum
       } catch (error) {
         console.error("Error fetching NFTs:", error);
       }
     }
-
-    // Update nftNum
+  
+  
 
     return previousState;
-  });
+  });///api/swaps/get-swap-details/?trade_id=${tradeId}
 
   //console.log(state.initNfts)
   return c.res({
