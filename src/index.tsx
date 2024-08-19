@@ -10,6 +10,7 @@ import NftGroups from "./component/NftGroups";
 import Title from "./component/Title";
 import axios from "axios";
 export const { Box, Image, Text, Columns, Column, Rows, Row } = createSystem();
+
 type State = {
   nftNum: number;
   initNfts: any[];
@@ -18,7 +19,7 @@ export const app = new Frog<{ State: State }>({
   title: "Frog Frame",
   initialState: {
     nftNum: 0,
-    initNfts: [],
+    initNfts: []
   },
 });
 
@@ -35,29 +36,18 @@ app.frame("/", async (c) => {
     a = a * 1;
     nftNum = nftNum + a;
   }
-
- //test api
-   //const detail = await axios.get("http://localhost:8800/api/swaps/get-swap-details/?trade_id=f917c6b8-6701-4c5c-a53b-0b327e311d22");
-   // console.log(detail)
   const state = await deriveState(async (previousState: any) => {
     if (previousState.initNfts.length === 0) {
       try {
         const response = await axios.get("http://localhost:8800/api/openswap/list");// replace your real api endpoint
-        previousState.initNfts = response.data.data;
-        console.log(response.data)
-     
-        // Update nftNum
+        previousState.initNfts = response.data.data;   
       } catch (error) {
         console.error("Error fetching NFTs:", error);
       }
     }
   
-  
-
     return previousState;
-  });///api/swaps/get-swap-details/?trade_id=${tradeId}
-
-  //console.log(state.initNfts)
+  });
   return c.res({
     image: (
       <div
@@ -121,19 +111,28 @@ app.frame("/", async (c) => {
         </Button>
       ),
       nftNum !== -1 && (
-        <Button action={"/nft/" + nftNum} value="review">
+        <Button action={"/nft/" + state.initNfts[0].open_trade_id} value="detail"> 
+        {/* replace   0 with nftNum*/}
           Detail
         </Button>
       ),
-      // status === 'response' && <Button.Reset>Reset</Button.Reset>,
     ],
   });
 });
 
-app.frame("/nft/:id", (c) => {
+app.frame("/nft/:id", async (c) => {
+
   const { id } = c.req.param();
-  let a: any = id;
-  a = (a * 1) / 2 + 1;
+
+  console.log('id', id) 
+
+  const detail = await axios.get(`http://localhost:8800/api/swaps/get-swap-details/?trade_id=${id}`);
+   console.log(detail) 
+
+    {/*In this you can test with this endpoint*/}
+     //test api
+     //const detail = await axios.get("http://localhost:8800/api/swaps/get-swap-details/?trade_id=f917c6b8-6701-4c5c-a53b-0b327e311d22");
+     // console.log(detail)
   return c.res({
     image: (
       <div
@@ -158,9 +157,8 @@ app.frame("/nft/:id", (c) => {
             <Image
               width="64"
               src={
-                "https://warpcast-nft-frame.vercel.app/asset/image/NFT" +
-                a +
-                ".png"
+               ""
+              //  replace image src with detail data. after get detailed data with ID.
               }
             />
           </div>
